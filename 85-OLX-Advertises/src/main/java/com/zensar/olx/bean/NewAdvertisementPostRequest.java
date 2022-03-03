@@ -12,8 +12,6 @@ public class NewAdvertisementPostRequest {
 	private int statusId;
 
 
-	
-
 	public NewAdvertisementPostRequest(int id, String title, int categoryId, String description, double price) {
 		super();
 		this.id = id;

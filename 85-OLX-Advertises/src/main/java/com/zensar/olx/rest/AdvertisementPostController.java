@@ -28,27 +28,27 @@ public class AdvertisementPostController {
 	@Autowired
 	AdvertismentPostService service;
 
-	//8 Posts new advertise 
+	// 8 Posts new advertise
 	@PostMapping("/advertise/{un}")
 	public NewAdvertisementPostResponse add(@RequestBody NewAdvertisementPostRequest request,
-			@PathVariable(name = "un") String userName) {
+			@PathVariable(name = "un") String userName) {//Receiving path variable
 		AdvertisementPost post = new AdvertisementPost();
 		post.setTitle(request.getTitle());
 		post.setPrice(request.getPrice());
 		post.setDescription(request.getDescription());
 
 		int categoryId = request.getCategoryId();
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate();//to interact between micro service->83 & 84
 		Category category;
-		String url = "http://localhost:9052/advertise/getcategory/" + categoryId;
-		category = restTemplate.getForObject(url, Category.class);
-		post.setCategory(category);
+		String url = "http://localhost:9052/advertise/getcategory/" + categoryId;//point to category service
+		category = restTemplate.getForObject(url, Category.class);//getForObject -->connect with micro service variable
+		post.setCategory(category);//store in post obj
 
 		url = "http://localhost:9051/user/find/" + userName;
 		OlxUser olxUser = restTemplate.getForObject(url, OlxUser.class);
 		post.setOlxUser(olxUser);
 
-		AdvertisementStatus advertisementStatus = new AdvertisementStatus(1, "OPEN");
+		AdvertisementStatus advertisementStatus = new AdvertisementStatus(1, "OPEN");//new request so hard coded
 		post.setAdvertisementStatus(advertisementStatus);
 
 		AdvertisementPost advertisementPost = this.service.addAdvertisement(post);
@@ -67,8 +67,8 @@ public class AdvertisementPostController {
 		return responce;
 	}
 //--------------------------------------------------------------------------------------------------------
-	//9 Updates existing advertise
-	
+	// 9 Updates existing advertise
+
 	@PutMapping("/advertise/{aid}/{userName}")
 	public NewAdvertisementPostResponse f2(@RequestBody NewAdvertisementPostRequest request,
 			@PathVariable(name = "aid") int id, @PathVariable(name = "userName") String userName) {
@@ -109,7 +109,7 @@ public class AdvertisementPostController {
 	}
 //----------------------------------------------------------------------------------------------------------------
 	// 10 Reads all advertisements posted by logged in user
-	
+
 	@GetMapping("/user/advertise/{userName}")
 	public List<NewAdvertisementPostResponse> f3(@PathVariable(name = "userName") String userName) {
 		List<AdvertisementPost> advPost = this.service.getAllAdvertisement();
@@ -156,7 +156,7 @@ public class AdvertisementPostController {
 	}
 
 //--------------------------------------------------------------------------------------------------------	
-	//11 Reads specific advertisement posed by logged in user
+	// 11 Reads specific advertisement posed by logged in user
 	@GetMapping("/user/advertise/{aId}/{userName}")
 	public NewAdvertisementPostResponse f4(@PathVariable(name = "aId") int id,
 			@PathVariable(name = "userName") String userName) {
@@ -195,42 +195,44 @@ public class AdvertisementPostController {
 		return postRespone;
 
 	}
+
 	// --------------------------------------------------------------------------------------------------
-	//12 Deletes specific advertisement posted by logged in user
+	// 12 Deletes specific advertisement posted by logged in user
 	@DeleteMapping("/user/advertise/{aId}")
-	public boolean delteAdvertisementById(@PathVariable(name = "aId") int id)
-	{		
-		AdvertisementPost advertisementPost=this.service.getAdvertisementById(id);
+	public boolean delteAdvertisementById(@PathVariable(name = "aId") int id) {
+		AdvertisementPost advertisementPost = this.service.getAdvertisementById(id);
 		System.out.println(advertisementPost);
 		return this.service.deleteAdvertisement(advertisementPost);
 	}
+
 //----------------------------------------------------------------------------------------------------------------------
-	//13 Search advertisements based upon given filter criteria
+	// 13 Search advertisements based upon given filter criteria
 	@GetMapping("/user/advertise/")
 	public NewAdvertisementPostResponse f6() {
 
 		return null;
 
 	}
+
 //----------------------------------------------------------------------------------------------------------
-	//14 Matches advertisements using the provided 'searchText' within all fields of an advertise.
-		@GetMapping("/user/advertise/")
-		public NewAdvertisementPostResponse f7() {
+	// 14 Matches advertisements using the provided 'searchText' within all fields
+	// of an advertise.
+	@GetMapping("/user/advertise/")
+	public NewAdvertisementPostResponse f7() {
 
-			return null;
+		return null;
 
-		}
+	}
 
-	
 //----------------------------------------------------------------------------------------------------------
-	//15 Return advertise details by id 
+	// 15 Return advertise details by id
 	@GetMapping("/user/advertiseById/{aid}")
 	public NewAdvertisementPostResponse getAdvertismentByUserId(@PathVariable(name = "aid") int id) {
 		AdvertisementPost advertisementPost = this.service.getAdvertisementById(id);
 		RestTemplate restTemplate = new RestTemplate();
 
 		String url = null;
-		url = "http://localhost:9051/user/"+advertisementPost.getOlxUser().getOlxUserId();
+		url = "http://localhost:9051/user/" + advertisementPost.getOlxUser().getOlxUserId();
 		OlxUser olxUser = restTemplate.getForObject(url, OlxUser.class);
 		advertisementPost.setOlxUser(olxUser);
 
@@ -243,23 +245,22 @@ public class AdvertisementPostController {
 		AdvertisementStatus advertisementStatus;
 		advertisementStatus = restTemplate.getForObject(url, AdvertisementStatus.class);
 		advertisementPost.setAdvertisementStatus(advertisementStatus);
-		
+
 		System.out.println(advertisementPost);
-		
+
 		NewAdvertisementPostResponse postRespone = new NewAdvertisementPostResponse();
 
-			postRespone.setId(advertisementPost.getId());
-			postRespone.setTitle(advertisementPost.getTitle());
-			postRespone.setUserName(advertisementPost.getOlxUser().getUserName());
-			postRespone.setDescription(advertisementPost.getDescription());
-			postRespone.setPrice(advertisementPost.getPrice());
-			postRespone.setCategory(advertisementPost.getCategory().getName());
-			postRespone.setCreatedDate(advertisementPost.getCreatedDate());
-			postRespone.setModifiedDate(advertisementPost.getModifiedDate());
-			postRespone.setStatus(advertisementPost.getAdvertisementStatus().getStatus());
-		
-			System.out.println(postRespone);
-		return postRespone;
+		postRespone.setId(advertisementPost.getId());
+		postRespone.setTitle(advertisementPost.getTitle());
+		postRespone.setUserName(advertisementPost.getOlxUser().getUserName());
+		postRespone.setDescription(advertisementPost.getDescription());
+		postRespone.setPrice(advertisementPost.getPrice());
+		postRespone.setCategory(advertisementPost.getCategory().getName());
+		postRespone.setCreatedDate(advertisementPost.getCreatedDate());
+		postRespone.setModifiedDate(advertisementPost.getModifiedDate());
+		postRespone.setStatus(advertisementPost.getAdvertisementStatus().getStatus());
 
+		System.out.println(postRespone);
+		return postRespone;
 	}
 }
