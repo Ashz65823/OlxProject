@@ -207,21 +207,119 @@ public class AdvertisementPostController {
 
 //----------------------------------------------------------------------------------------------------------------------
 	// 13 Search advertisements based upon given filter criteria
-	@GetMapping("/user/advertise/")
-	public NewAdvertisementPostResponse f6() {
+	@GetMapping("/advertise/search/filtercriteria/{searchAll}")
+	public List<NewAdvertisementPostResponse> searchBasedOnAll(@PathVariable(name="searchAll") String searchText) {
+		List<AdvertisementPost> allPost=this.service.getAllAdvertisement();
+		RestTemplate restTemplate=new RestTemplate();
+		for(AdvertisementPost advertisementPost:allPost)
+		{
+			String url = null;
+			url = "http://localhost:9051/user/" + advertisementPost.getOlxUser().getOlxUserId();
+			OlxUser olxUser = restTemplate.getForObject(url, OlxUser.class);
+			advertisementPost.setOlxUser(olxUser);
 
-		return null;
+			Category category;
+			url = "http://localhost:9052/advertise/getcategory/" + advertisementPost.getCategory().getId();
+			category = restTemplate.getForObject(url, Category.class);
+			advertisementPost.setCategory(category);
+
+			url = "http://localhost:9052/advertise/status/" + advertisementPost.getAdvertisementStatus().getId();
+			AdvertisementStatus advertisementStatus;
+			advertisementStatus = restTemplate.getForObject(url, AdvertisementStatus.class);
+			advertisementPost.setAdvertisementStatus(advertisementStatus);
+		}
+		List<AdvertisementPost>filterPosts=new ArrayList<>();
+		for(AdvertisementPost advertisementPost:allPost)
+		{
+			if((advertisementPost.getCategory().getName().contains(searchText))||
+					(advertisementPost.getTitle().contains(searchText))
+					||(advertisementPost.getDescription().contains(searchText))||
+					(advertisementPost.getAdvertisementStatus().getStatus().contains(searchText))||
+					(advertisementPost.getCreatedDate().toString().contains(searchText))||
+					(advertisementPost.getModifiedDate().toString().contains(searchText))
+					)
+			{
+				filterPosts.add(advertisementPost);
+			}
+		}
+
+		List<NewAdvertisementPostResponse> responce=new ArrayList<>();
+		for(AdvertisementPost advertisementPost:filterPosts)
+		{
+			NewAdvertisementPostResponse postRespone = new NewAdvertisementPostResponse();
+			
+
+			postRespone.setId(advertisementPost.getId());
+			postRespone.setTitle(advertisementPost.getTitle());
+			postRespone.setUserName(advertisementPost.getOlxUser().getUserName());
+			postRespone.setDescription(advertisementPost.getDescription());
+			postRespone.setPrice(advertisementPost.getPrice());
+			postRespone.setCategory(advertisementPost.getCategory().getName());
+			postRespone.setCreatedDate(advertisementPost.getCreatedDate());
+			postRespone.setModifiedDate(advertisementPost.getModifiedDate());
+			postRespone.setStatus(advertisementPost.getAdvertisementStatus().getStatus());
+			responce.add(postRespone);
+		}
+		return responce;
 
 	}
 
 //----------------------------------------------------------------------------------------------------------
 	// 14 Matches advertisements using the provided 'searchText' within all fields
 	// of an advertise.
-	@GetMapping("/user/advertise/")
-	public NewAdvertisementPostResponse f7() {
+	@GetMapping("/advertise/{search}")
+	public List<NewAdvertisementPostResponse> f7(@PathVariable(name="search")String searchText) {
+		List<AdvertisementPost>allPost=this.service.getAllAdvertisement();
+		System.out.println(allPost);
+		RestTemplate restTemplate=new RestTemplate();
+		for(AdvertisementPost advertisementPost:allPost)
+		{
+			String url = null;
+			url = "http://localhost:9051/user/" + advertisementPost.getOlxUser().getOlxUserId();
+			OlxUser olxUser = restTemplate.getForObject(url, OlxUser.class);
+			advertisementPost.setOlxUser(olxUser);
 
-		return null;
+			Category category;
+			url = "http://localhost:9052/advertise/getcategory/" + advertisementPost.getCategory().getId();
+			category = restTemplate.getForObject(url, Category.class);
+			advertisementPost.setCategory(category);
 
+			url = "http://localhost:9052/advertise/status/" + advertisementPost.getAdvertisementStatus().getId();
+			AdvertisementStatus advertisementStatus;
+			advertisementStatus = restTemplate.getForObject(url, AdvertisementStatus.class);
+			advertisementPost.setAdvertisementStatus(advertisementStatus);
+			
+		}
+		List<AdvertisementPost>filterPosts=new ArrayList<>();
+		for(AdvertisementPost advertisementPost:allPost)
+		{
+			if((advertisementPost.getCategory().getName().toLowerCase().contains(searchText.toLowerCase()))||
+					(advertisementPost.getTitle().toLowerCase().contains(searchText.toLowerCase()))
+					||(advertisementPost.getDescription().toLowerCase().contains(searchText.toLowerCase()))||
+					(advertisementPost.getAdvertisementStatus().getStatus().toLowerCase().contains(searchText.toLowerCase()))
+					)
+			{
+				filterPosts.add(advertisementPost);
+			}
+		}
+		List<NewAdvertisementPostResponse> responce=new ArrayList<>();
+		for(AdvertisementPost advertisementPost:filterPosts)
+		{
+			NewAdvertisementPostResponse postRespone = new NewAdvertisementPostResponse();
+			
+
+			postRespone.setId(advertisementPost.getId());
+			postRespone.setTitle(advertisementPost.getTitle());
+			postRespone.setUserName(advertisementPost.getOlxUser().getUserName());
+			postRespone.setDescription(advertisementPost.getDescription());
+			postRespone.setPrice(advertisementPost.getPrice());
+			postRespone.setCategory(advertisementPost.getCategory().getName());
+			postRespone.setCreatedDate(advertisementPost.getCreatedDate());
+			postRespone.setModifiedDate(advertisementPost.getModifiedDate());
+			postRespone.setStatus(advertisementPost.getAdvertisementStatus().getStatus());
+			responce.add(postRespone);
+		}
+		return responce;
 	}
 
 //----------------------------------------------------------------------------------------------------------
