@@ -1,0 +1,8 @@
+1648095380631	Rename package 'configuration'
+1648095481238	Rename package 'filter'
+1648095752452	Rename package 'service'
+1648095797159	Delete element
+1648095891231	Rename package 'util'
+1648096948434	Delete element
+1648096991600	Rename type 'ZensarUserDetailsServiceImpl'
+1648098264877	Rename local variable 'userResponse'

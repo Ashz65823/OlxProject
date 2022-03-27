@@ -1,0 +1,29 @@
+package com.zensar.olx.DB;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class TokenStorage {
+
+	private static Map<String, String> tokenCache;
+	static
+	{
+		tokenCache=new HashMap<>();
+	}
+	
+	public static Map<String, String> getCache() {
+		return tokenCache;
+	}
+	
+	//This method is responsible 
+	public static void storeToken(String key,String token)
+	{
+		tokenCache.put(key, token);
+	}
+	
+	//This method is responsible for removing token from server Cache
+	public static String RemoveToken(String key)
+	{
+		return tokenCache.remove(key);
+	}
+}
